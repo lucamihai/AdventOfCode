@@ -1,2 +1,10 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿namespace AdventOfCode2022;
+
+public static class Program
+{
+    public static void Main(string[] args)
+    {
+        Day01.Solve();
+        Console.Read();
+    }
+}
