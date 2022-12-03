@@ -8,7 +8,6 @@ public static class Day03Solution
         var inputLines = File.ReadAllLines(path);
 
         var allCommonCharacters = new List<char>();
-        var highestScore = int.MinValue;
         
         foreach (var inputLine in inputLines)
         {
@@ -38,12 +37,7 @@ public static class Day03Solution
         }
 
         var score = allCommonCharacters.Select(GetCharacterPriority).Sum();
-
-        if (score > highestScore)
-        {
-            highestScore = score;
-        }
-        Console.WriteLine($"Highest score found: {highestScore}");
+        Console.WriteLine($"Highest score found: {score}");
     }
 
     private static int GetCharacterPriority(char character)
