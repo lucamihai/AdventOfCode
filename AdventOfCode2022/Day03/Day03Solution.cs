@@ -7,8 +7,14 @@ public static class Day03Solution
         var path = Path.Combine("Day03", "Day03Input.txt");
         var inputLines = File.ReadAllLines(path);
 
+        HandleFirstPart(inputLines);
+        HandleSecondPart(inputLines);
+    }
+
+    private static void HandleFirstPart(string[] inputLines)
+    {
         var allCommonCharacters = new List<char>();
-        
+
         foreach (var inputLine in inputLines)
         {
             var characterCount = inputLine.Length;
@@ -37,7 +43,43 @@ public static class Day03Solution
         }
 
         var score = allCommonCharacters.Select(GetCharacterPriority).Sum();
-        Console.WriteLine($"Highest score found: {score}");
+        Console.WriteLine($"Part1: Score is {score}");
+    }
+
+    private static void HandleSecondPart(string[] inputLines)
+    {
+        var score = 0;
+
+        for (var lineIndex = 0; lineIndex < inputLines.Length; lineIndex+= 3)
+        {
+            var groupCommonCharacters = new HashSet<char>();
+            groupCommonCharacters.UnionWith(inputLines[lineIndex]);
+
+            for (var groupLineIndex = lineIndex; groupLineIndex < lineIndex + 3; groupLineIndex++)
+            {
+                var inputLine = inputLines[groupLineIndex];
+                var characterCount = inputLine.Length;
+
+                var alreadyEncounteredCharacters = new HashSet<char>();
+
+                for (var characterIndex = 0; characterIndex < characterCount; characterIndex++)
+                {
+                    alreadyEncounteredCharacters.Add(inputLine[characterIndex]);
+                }
+
+                groupCommonCharacters.IntersectWith(alreadyEncounteredCharacters);
+            }
+
+            if (groupCommonCharacters.Count != 1)
+            {
+                throw new InvalidOperationException($"Should have found 1 common element, found {groupCommonCharacters.Count} instead for group starting at index {lineIndex}");
+            }
+
+            var badge = groupCommonCharacters.First();
+            score += GetCharacterPriority(badge);
+        }
+        
+        Console.WriteLine($"Part2: Score is {score}");
     }
 
     private static int GetCharacterPriority(char character)
