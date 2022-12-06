@@ -11,16 +11,8 @@ public static class Day05Solution
         var inputLines = File.ReadAllLines(path).ToList();
         ParseInput(inputLines, out var itemStacks, out var moves);
 
-        DisplayItemStacks(itemStacks);
-
-        foreach (var move in moves)
-        {
-            PerformMove(itemStacks, move);
-        }
-
-        DisplayItemStacks(itemStacks);
-
-        Console.WriteLine($"Part1 result: {GetResult(itemStacks)}");
+        HandleFirstPart(itemStacks, moves);
+        HandleSecondPart(itemStacks, moves);
     }
 
     private static void ParseInput(List<string> inputLines, out List<Stack<char>> itemStacks, out List<Move> moves)
@@ -67,7 +59,31 @@ public static class Day05Solution
         }
     }
 
-    private static void PerformMove(List<Stack<char>> itemStacks, Move move)
+    private static void HandleFirstPart(List<Stack<char>> itemStacks, List<Move> moves)
+    {
+        var itemStacksCopy = CopyItemStacks(itemStacks);
+
+        foreach (var move in moves)
+        {
+            PerformMoveFirstPart(itemStacksCopy, move);
+        }
+
+        Console.WriteLine($"Part1 result: {GetResult(itemStacksCopy)}");
+    }
+
+    private static void HandleSecondPart(List<Stack<char>> itemStacks, List<Move> moves)
+    {
+        var itemStacksCopy = CopyItemStacks(itemStacks);
+
+        foreach (var move in moves)
+        {
+            PerformMoveSecondPart(itemStacksCopy, move);
+        }
+
+        Console.WriteLine($"Part2 result: {GetResult(itemStacksCopy)}");
+    }
+
+    private static void PerformMoveFirstPart(List<Stack<char>> itemStacks, Move move)
     {
         var stackOrigin = itemStacks[move.Origin - 1];
         var stackDestination = itemStacks[move.Destination - 1];
@@ -76,6 +92,37 @@ public static class Day05Solution
         {
             stackDestination.Push(stackOrigin.Pop());
         }
+    }
+
+    private static void PerformMoveSecondPart(List<Stack<char>> itemStacks, Move move)
+    {
+        var stackOrigin = itemStacks[move.Origin - 1];
+        var stackDestination = itemStacks[move.Destination - 1];
+
+        var itemsToMove = new List<char>();
+
+        for (var i = 0; i < move.Quantity; i++)
+        {
+            itemsToMove.Add(stackOrigin.Pop());
+        }
+
+        for (var index = itemsToMove.Count - 1; index >= 0; index--)
+        {
+            var itemToMove = itemsToMove[index];
+            stackDestination.Push(itemToMove);
+        }
+    }
+
+    private static List<Stack<char>> CopyItemStacks(List<Stack<char>> itemStacks)
+    {
+        var itemStacksCopy = new List<Stack<char>>();
+
+        foreach (var itemStack in itemStacks)
+        {
+            itemStacksCopy.Add(new Stack<char>(itemStack.AsEnumerable().Reverse()));
+        }
+
+        return itemStacksCopy;
     }
 
     private static string GetResult(List<Stack<char>> itemStacks)
@@ -90,6 +137,7 @@ public static class Day05Solution
         return stringBuilder.ToString();
     }
 
+    // Use for debug and/or fun
     private static void DisplayItemStacks(List<Stack<char>> itemStacks)
     {
         var stackMaxCount = itemStacks
