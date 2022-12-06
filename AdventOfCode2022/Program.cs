@@ -3,6 +3,7 @@ using AdventOfCode2022.Day02;
 using AdventOfCode2022.Day03;
 using AdventOfCode2022.Day04;
 using AdventOfCode2022.Day05;
+using AdventOfCode2022.Day06;
 
 namespace AdventOfCode2022;
 
@@ -14,7 +15,8 @@ public static class Program
         //Day02Solution.Solve();
         //Day03Solution.Solve();
         //Day04Solution.Solve();
-        Day05Solution.Solve();
+        //Day05Solution.Solve();
+        Day06Solution.Solve();
 
         Console.Read();
     }
