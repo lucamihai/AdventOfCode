@@ -4,6 +4,9 @@ namespace AdventOfCode2022.Day07;
 
 public static class Day07Solution
 {
+    private const int FileSystemSize = 70000000;
+    private const int RequiredFreeSpace = 30000000;
+
     public static void Solve()
     {
         var path = Path.Combine("Day07", "Day07Input.txt");
@@ -15,6 +18,11 @@ public static class Day07Solution
         var directoriesUnderThisSize = baseDirectory.GetDirectoriesUnderThisSize(100000);
         var sum = directoriesUnderThisSize.Sum(x => x.Size);
         Console.WriteLine($"Part1: Total size: {sum}");
+
+        var alreadyFreeSpace = FileSystemSize - baseDirectory.Size;
+        var differenceRequired = RequiredFreeSpace - alreadyFreeSpace;
+        var smallestDirectoryOfAtLeastThisSize = baseDirectory.FindSmallestDirectoryOfAtLeastThisSize(differenceRequired);
+        Console.WriteLine($"Part2: Found directory size: {smallestDirectoryOfAtLeastThisSize.Size}");
     }
 
     private static MyDirectory BuildDirectoryStructure(List<string> inputLines)

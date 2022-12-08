@@ -32,12 +32,20 @@ public class MyDirectory
     public List<MyDirectory> GetDirectoriesUnderThisSize(int maxSize)
     {
         var foundDirectories = new List<MyDirectory>();
-        Search(this, maxSize, foundDirectories);
+        SearchDirectoriesUnderThisSize(this, maxSize, foundDirectories);
 
         return foundDirectories;
     }
 
-    private static void Search(MyDirectory directory, int maxSize, List<MyDirectory> foundDirectories)
+    public MyDirectory FindSmallestDirectoryOfAtLeastThisSize(int minSize)
+    {
+        var currentBest = new MyDirectory { Size = int.MaxValue };
+        SearchSmallestDirectoryOfAtLeastThisSize(this, minSize, ref currentBest);
+
+        return currentBest;
+    }
+
+    private static void SearchDirectoriesUnderThisSize(MyDirectory directory, int maxSize, List<MyDirectory> foundDirectories)
     {
         if (directory.Size <= maxSize)
         {
@@ -46,7 +54,20 @@ public class MyDirectory
 
         foreach (var subDirectory in directory.Directories.Values)
         {
-            Search(subDirectory, maxSize, foundDirectories);
+            SearchDirectoriesUnderThisSize(subDirectory, maxSize, foundDirectories);
+        }
+    }
+
+    private static void SearchSmallestDirectoryOfAtLeastThisSize(MyDirectory directory, int minSize, ref MyDirectory currentBest)
+    {
+        if (directory.Size >= minSize && directory.Size < currentBest.Size)
+        {
+            currentBest = directory;
+        }
+
+        foreach (var subDirectory in directory.Directories.Values)
+        {
+            SearchSmallestDirectoryOfAtLeastThisSize(subDirectory, minSize, ref currentBest);
         }
     }
 }
