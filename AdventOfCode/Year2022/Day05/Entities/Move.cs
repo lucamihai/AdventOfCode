@@ -1,4 +1,4 @@
-﻿namespace AdventOfCode2022.Day05.Entities;
+﻿namespace AdventOfCode.Year2022.Day05.Entities;
 
 public class Move
 {

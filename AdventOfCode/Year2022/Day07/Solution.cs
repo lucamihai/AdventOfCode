@@ -1,15 +1,15 @@
-﻿using AdventOfCode2022.Day07.Entities;
+﻿using AdventOfCode.Year2022.Day07.Entities;
 
-namespace AdventOfCode2022.Day07;
+namespace AdventOfCode.Year2022.Day07;
 
-public static class Day07Solution
+public static class Solution
 {
     private const int FileSystemSize = 70000000;
     private const int RequiredFreeSpace = 30000000;
 
     public static void Solve()
     {
-        var path = Path.Combine("Day07", "Day07Input.txt");
+        var path = Path.Combine("Year2022", "Day07", "Input.txt");
         var inputLines = File.ReadAllLines(path).ToList();
 
         var baseDirectory = BuildDirectoryStructure(inputLines);

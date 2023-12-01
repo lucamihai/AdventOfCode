@@ -1,13 +1,13 @@
 ﻿using System.Text;
-using AdventOfCode2022.Day05.Entities;
+using AdventOfCode.Year2022.Day05.Entities;
 
-namespace AdventOfCode2022.Day05;
+namespace AdventOfCode.Year2022.Day05;
 
-public static class Day05Solution
+public static class Solution
 {
     public static void Solve()
     {
-        var path = Path.Combine("Day05", "Day05Input.txt");
+        var path = Path.Combine("Year2022", "Day05", "Input.txt");
         var inputLines = File.ReadAllLines(path).ToList();
         ParseInput(inputLines, out var itemStacks, out var moves);
 

@@ -1,6 +1,6 @@
-﻿namespace AdventOfCode2022.Day02;
+﻿namespace AdventOfCode.Year2022.Day02;
 
-public static class Day02Solution
+public static class Solution
 {
     private static readonly Dictionary<char, int> SymbolScores = new Dictionary<char, int>
     {
@@ -44,7 +44,7 @@ public static class Day02Solution
 
     public static void Solve()
     {
-        var path = Path.Combine("Day02", "Day02Input.txt");
+        var path = Path.Combine("Year2022", "Day02", "Input.txt");
         var inputLines = File.ReadAllLines(path);
 
         var scoreFirstPart = 0;

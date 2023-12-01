@@ -1,4 +1,4 @@
-﻿namespace AdventOfCode2022.Day07.Entities;
+﻿namespace AdventOfCode.Year2022.Day07.Entities;
 
 public class MyFile
 {

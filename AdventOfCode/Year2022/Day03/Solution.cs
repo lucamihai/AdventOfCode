@@ -1,10 +1,10 @@
-﻿namespace AdventOfCode2022.Day03;
+﻿namespace AdventOfCode.Year2022.Day03;
 
-public static class Day03Solution
+public static class Solution
 {
     public static void Solve()
     {
-        var path = Path.Combine("Day03", "Day03Input.txt");
+        var path = Path.Combine("Year2022", "Day03", "Input.txt");
         var inputLines = File.ReadAllLines(path);
 
         HandleFirstPart(inputLines);
