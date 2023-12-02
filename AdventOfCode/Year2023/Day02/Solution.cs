@@ -24,8 +24,12 @@ public static class Solution
         var games = GetGames();
         var possibleGames = GetPossibleGames(games);
 
-        var sum = possibleGames.Select(x => x.Id).Sum();
-        Console.WriteLine($"The sum of the IDs of possible games is: {sum}.");
+        var sumOfIdsOfPossibleGames = possibleGames.Select(x => x.Id).Sum();
+        Console.WriteLine($"The sum of the IDs of possible games is: {sumOfIdsOfPossibleGames}.");
+
+        games.ForEach(x => x.ComputeMinimumCubesRequiredPerColor(Colors));
+        var sumOfGamesSetPower = games.Select(GetGameSetPower).Sum();
+        Console.WriteLine($"The sum of the games set power is: {sumOfGamesSetPower}.");
     }
 
     private static List<GameDetails> GetGames()
@@ -70,6 +74,18 @@ public static class Solution
         return games
             .Where(IsGamePossible)
             .ToList();
+    }
+
+    private static int GetGameSetPower(GameDetails game)
+    {
+        var setPower = 1;
+
+        foreach (var count in game.MinimumCubesRequiredPerColor.Values)
+        {
+            setPower *= count;
+        }
+
+        return setPower;
     }
 
     private static bool IsGamePossible(GameDetails game)

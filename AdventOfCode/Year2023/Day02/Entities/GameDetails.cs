@@ -6,6 +6,35 @@ public class GameDetails
 {
     public int Id { get; set; }
     public Dictionary<int, Dictionary<string, int>> ColorCubesCountPerRound { get; set; } = new();
+    public Dictionary<string, int> MinimumCubesRequiredPerColor { get; set; } = new();
+
+    public void ComputeMinimumCubesRequiredPerColor(ICollection<string> colors)
+    {
+        MinimumCubesRequiredPerColor.Clear();
+
+        foreach (var color in colors)
+        {
+            MinimumCubesRequiredPerColor.Add(color, 0);
+        }
+
+        foreach (var roundDetails in ColorCubesCountPerRound.Values)
+        {
+            foreach (var color in colors)
+            {
+                if (!roundDetails.ContainsKey(color))
+                {
+                    continue;
+                }
+
+                var currentCount = roundDetails[color];
+
+                if (currentCount > MinimumCubesRequiredPerColor[color])
+                {
+                    MinimumCubesRequiredPerColor[color] = currentCount;
+                }
+            }
+        }
+    }
 
     public override string ToString()
     {
