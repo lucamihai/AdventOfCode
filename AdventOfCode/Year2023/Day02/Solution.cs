@@ -45,13 +45,11 @@ public static class Solution
             var game = new GameDetails { Id = int.Parse(tokens[0].Trim().Split().Last()) };
             var gameRoundTokens = tokens[1].Split(";");
 
-            var roundCount = 1;
-
             foreach (var gameRoundToken in gameRoundTokens)
             {
                 var colorTokens = gameRoundToken.Split(",");
-                var currentRound = new Dictionary<string, int>();
-                game.ColorCubesCountPerRound.Add(roundCount++, currentRound);
+                var currentRound = new RoundDetails();
+                game.Rounds.Add(currentRound);
 
                 foreach (var colorToken in colorTokens)
                 {
@@ -59,7 +57,7 @@ public static class Solution
                     var count = int.Parse(temp[0]);
                     var color = temp[1];
 
-                    currentRound.Add(color, count);
+                    currentRound.ColorCubesCount.Add(color, count);
                 }
             }
 
@@ -69,11 +67,9 @@ public static class Solution
         return games;
     }
 
-    private static List<GameDetails> GetPossibleGames(List<GameDetails> games)
+    private static IEnumerable<GameDetails> GetPossibleGames(IEnumerable<GameDetails> games)
     {
-        return games
-            .Where(IsGamePossible)
-            .ToList();
+        return games.Where(IsGamePossible);
     }
 
     private static int GetGameSetPower(GameDetails game)
@@ -90,16 +86,16 @@ public static class Solution
 
     private static bool IsGamePossible(GameDetails game)
     {
-        foreach (var roundColorCubesCount in game.ColorCubesCountPerRound.Values)
+        foreach (var round in game.Rounds)
         {
             foreach (var color in Colors)
             {
-                if (!roundColorCubesCount.ContainsKey(color))
+                if (!round.ColorCubesCount.TryGetValue(color, out var count))
                 {
                     continue;
                 }
 
-                if (roundColorCubesCount[color] > AllowedColorCubesCounts[color])
+                if (count > AllowedColorCubesCounts[color])
                 {
                     return false;
                 }

@@ -5,7 +5,7 @@ namespace AdventOfCode.Year2023.Day02.Entities;
 public class GameDetails
 {
     public int Id { get; set; }
-    public Dictionary<int, Dictionary<string, int>> ColorCubesCountPerRound { get; set; } = new();
+    public List<RoundDetails> Rounds { get; set; } = new();
     public Dictionary<string, int> MinimumCubesRequiredPerColor { get; set; } = new();
 
     public void ComputeMinimumCubesRequiredPerColor(ICollection<string> colors)
@@ -17,16 +17,14 @@ public class GameDetails
             MinimumCubesRequiredPerColor.Add(color, 0);
         }
 
-        foreach (var roundDetails in ColorCubesCountPerRound.Values)
+        foreach (var round in Rounds)
         {
             foreach (var color in colors)
             {
-                if (!roundDetails.ContainsKey(color))
+                if (!round.ColorCubesCount.TryGetValue(color, out var currentCount))
                 {
                     continue;
                 }
-
-                var currentCount = roundDetails[color];
 
                 if (currentCount > MinimumCubesRequiredPerColor[color])
                 {
@@ -41,11 +39,9 @@ public class GameDetails
         var stringBuilder = new StringBuilder();
         stringBuilder.Append($"Game {Id}: ");
 
-        foreach (var round in ColorCubesCountPerRound.Keys)
+        foreach (var round in Rounds)
         {
-            var roundDetails = ColorCubesCountPerRound[round];
-
-            stringBuilder.Append(string.Join(", ", roundDetails.Select(x => $"{x.Value} {x.Key}").ToList()));
+            stringBuilder.Append(string.Join(", ", round.ColorCubesCount.Select(x => $"{x.Value} {x.Key}").ToList()));
             stringBuilder.Append("; ");
         }
 
