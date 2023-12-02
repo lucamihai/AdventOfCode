@@ -12,7 +12,8 @@ public static class Program
         //Year2022.Day06.Solution.Solve();
         //Year2022.Day07.Solution.Solve();
 
-        Year2023.Day01.Solution.Solve();
+        //Year2023.Day01.Solution.Solve();
+        Year2023.Day02.Solution.Solve();
 
         Console.Read();
     }
