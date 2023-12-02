@@ -2,7 +2,38 @@
 
 public static class Solution
 {
-    private static readonly HashSet<char> Digits = new HashSet<char>{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    private static readonly Dictionary<string, int> DigitDictionary;
+    private static readonly HashSet<string> DigitStrings;
+
+    static Solution()
+    {
+        DigitDictionary = new Dictionary<string, int>
+        {
+            { "zero", 0 },
+            { "one", 1 },
+            { "two", 2 },
+            { "three", 3 },
+            { "four", 4 },
+            { "five", 5 },
+            { "six", 6 },
+            { "seven", 7 },
+            { "eight", 8 },
+            { "nine", 9 },
+
+            { "0", 0 },
+            { "1", 1 },
+            { "2", 2 },
+            { "3", 3 },
+            { "4", 4 },
+            { "5", 5 },
+            { "6", 6 },
+            { "7", 7 },
+            { "8", 8 },
+            { "9", 9 }
+        };
+
+        DigitStrings = DigitDictionary.Keys.ToHashSet();
+    }
 
     public static void Solve()
     {
@@ -26,16 +57,33 @@ public static class Solution
                 continue;
             }
 
-            var foundDigits = inputLine.Where(Digits.Contains).ToList();
+            var firstDigitString = string.Empty;
+            var firstDigitIndex = int.MaxValue;
 
-            if (foundDigits.Count < 1)
+            var lastDigitString = string.Empty;
+            var lastDigitIndex = int.MinValue;
+
+            foreach (var digitString in DigitStrings)
             {
-                throw new Exception($"Could not find any digits in line '{inputLine}'");
+                var firstIndexOf = inputLine.IndexOf(digitString);
+                if (firstIndexOf != -1 && firstIndexOf < firstDigitIndex)
+                {
+                    firstDigitString = digitString;
+                    firstDigitIndex = firstIndexOf;
+                }
+
+                var lastIndexOf = inputLine.LastIndexOf(digitString);
+                if (lastIndexOf != -1 && lastIndexOf > lastDigitIndex)
+                {
+                    lastDigitString = digitString;
+                    lastDigitIndex = lastIndexOf;
+                }
             }
 
-            var firstDigit = foundDigits.First() - '0';
-            var lastDigit = foundDigits.Last() - '0';
-            values.Add(firstDigit * 10 + lastDigit);
+            var firstDigit = DigitDictionary[firstDigitString];
+            var lastDigit = DigitDictionary[lastDigitString];
+            var value = firstDigit * 10 + lastDigit;
+            values.Add(value);
         }
 
         return values;
