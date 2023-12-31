@@ -63,23 +63,24 @@ public static class Solution
 
     private static void Help(Dictionary<int, List<Card>> cardsByIndex, List<Card> originalCards, List<Card> currentCards, int id)
     {
-        foreach (var card in currentCards)
+        var card = currentCards[0];
+        var cardScore = GetCardScore(card);
+
+        if (cardScore == 0)
         {
-            var cardScore = GetCardScore(card);
+            return;
+        }
 
-            if (cardScore == 0)
+        var extraCardsToPick = (int)Math.Log2(cardScore) + 1;
+        var extraCards = originalCards.Skip(id + 1).Take(extraCardsToPick).ToList();
+
+        for (var i = 0; i < extraCards.Count; i++)
+        {
+            var extraCard = extraCards[i];
+            var extraCardIndex = id + i + 1;
+
+            for (var index = 0; index < currentCards.Count; index++)
             {
-                continue;
-            }
-
-            var extraCardsToPick = (int)Math.Log2(cardScore) + 1;
-            var extraCards = originalCards.Skip(id + 1).Take(extraCardsToPick).ToList();
-
-            for (var i = 0; i < extraCards.Count; i++)
-            {
-                var extraCard = extraCards[i];
-                var extraCardIndex = id + i + 1;
-
                 cardsByIndex[extraCardIndex].Add(extraCard);
             }
         }
