@@ -10,6 +10,9 @@ public static class Solution
 
         var totalScore = cards.Select(GetCardScore).Sum();
         Console.WriteLine($"The cards are worth {totalScore} points.");
+
+        var newCards = GetCardsAccordingToNewRules(cards).ToList();
+        Console.WriteLine($"The new cards are worth {newCards.Count} points.");
     }
 
     private static List<Card> GetCards()
@@ -24,12 +27,6 @@ public static class Solution
             var cardInfo = inputLine.Split(':')[1];
             var cardInfoTokens = cardInfo.Split("|");
 
-            var a1 = cardInfoTokens[0].Trim();
-            var b1 = cardInfoTokens[0].Trim().Split().Where(x => x != string.Empty).ToList();
-
-            var a2 = cardInfoTokens[1].Trim();
-            var b2 = cardInfoTokens[1].Trim().Split().Where(x => x != string.Empty).ToList();
-
             cards.Add(new Card
             {
                 WinningNumbers = cardInfoTokens[0].Trim().Split().Where(x => x != string.Empty).Select(int.Parse).ToHashSet(),
@@ -38,6 +35,54 @@ public static class Solution
         }
 
         return cards;
+    }
+
+    private static List<Card> GetCardsAccordingToNewRules(List<Card> originalCards)
+    {
+        var newCards = new List<Card>();
+
+        var cardsByIndex = new Dictionary<int, List<Card>>();
+
+        for (int index = 0; index < originalCards.Count; index++)
+        {
+            cardsByIndex.Add(index, new List<Card> { originalCards[index] });
+        }
+
+        foreach (var a in cardsByIndex)
+        {
+            Help(cardsByIndex, originalCards, a.Value, a.Key);
+        }
+
+        foreach (var a in cardsByIndex)
+        {
+            newCards.AddRange(a.Value);
+        }
+
+        return newCards;
+    }
+
+    private static void Help(Dictionary<int, List<Card>> cardsByIndex, List<Card> originalCards, List<Card> currentCards, int id)
+    {
+        foreach (var card in currentCards)
+        {
+            var cardScore = GetCardScore(card);
+
+            if (cardScore == 0)
+            {
+                continue;
+            }
+
+            var extraCardsToPick = (int)Math.Log2(cardScore) + 1;
+            var extraCards = originalCards.Skip(id + 1).Take(extraCardsToPick).ToList();
+
+            for (var i = 0; i < extraCards.Count; i++)
+            {
+                var extraCard = extraCards[i];
+                var extraCardIndex = id + i + 1;
+
+                cardsByIndex[extraCardIndex].Add(extraCard);
+            }
+        }
     }
 
     private static int GetCardScore(Card card)
