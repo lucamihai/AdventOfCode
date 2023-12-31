@@ -12,7 +12,7 @@ public static class Solution
         Console.WriteLine($"The cards are worth {totalScore} points.");
 
         var newCards = GetCardsAccordingToNewRules(cards).ToList();
-        Console.WriteLine($"The new cards are worth {newCards.Count} points.");
+        Console.WriteLine($"There are {newCards.Count} new cards.");
     }
 
     private static List<Card> GetCards()
