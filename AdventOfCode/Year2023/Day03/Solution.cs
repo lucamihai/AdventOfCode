@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode.Year2023.Day03;
+﻿using AdventOfCode.Year2023.Day03.Entities;
+
+namespace AdventOfCode.Year2023.Day03;
 
 public static class Solution
 {
@@ -7,17 +9,22 @@ public static class Solution
 
     public static void Solve()
     {
-        var allPartNumbers = GetAllPartNumbers();
+        var (partNumbers, gearPositions) = GetPartNumbersAndGearPositions();
+        var partNumbersSum = partNumbers.Select(x => x.Value).Sum();
+        Console.WriteLine($"The sum of the part numbers is: {partNumbersSum}.");
 
-        var sum = allPartNumbers.Sum();
-        Console.WriteLine($"The sum of the part numbers is: {sum}.");
+        var gearRatios = GetGearRatios(partNumbers, gearPositions);
+        var gearRatiosSum = gearRatios.Sum();
+        Console.WriteLine($"The sum of the gear ratios is: {gearRatiosSum}.");
     }
 
-    private static List<int> GetAllPartNumbers()
+    private static (List<PartNumber> partNumbers, List<(int row, int column)> gearPositions) GetPartNumbersAndGearPositions()
     {
         var path = Path.Combine("Year2023", "Day03", "Input.txt");
         var inputLines = File.ReadAllLines(path);
-        var values = new List<int>();
+
+        var partNumbers = new List<PartNumber>();
+        var gearPositions = new List<(int row, int column)>();
 
         for (int i = 0; i < inputLines.Length; i++)
         {
@@ -25,81 +32,120 @@ public static class Solution
             var currentLine = inputLines[i];
             var nextLine = i < inputLines.Length - 1 ? inputLines[i + 1] : null;
 
-            values.AddRange(ExtractPartNumbers(previousLine, currentLine, nextLine));
+            var (localPartNumbers, localGearPositions) = ExtractLocalPartNumbersAndGearPositions(row: i, previousLine, currentLine, nextLine);
+
+            partNumbers.AddRange(localPartNumbers);
+            gearPositions.AddRange(localGearPositions);
         }
 
-        return values;
+        return (partNumbers, gearPositions);
     }
 
-    private static List<int> ExtractPartNumbers(string previousLine, string currentLine, string nextLine)
+    private static (List<PartNumber> partNumbers, List<(int row, int column)> gearPositions) ExtractLocalPartNumbersAndGearPositions(int row, string previousLine, string currentLine, string nextLine)
     {
-        var partNumbers = new List<int>();
-        var currentNumberString = string.Empty;
+        var partNumbers = new List<PartNumber>();
+        var gearPositions = new List<(int row, int column)>();
 
-        var scanRangePreviousLine = new HashSet<int>();
-        var scanRangeCurrentLine = new HashSet<int>();
-        var scanRangeNextLine = new HashSet<int>();
+        var currentNumberString = string.Empty;
+        var currentNumberPositionStart = -1;
+        var currentNumberPositionEnd = -1;
+
+        var scanAreaPreviousLine = new HashSet<int>();
+        var scanAreaCurrentLine = new HashSet<int>();
+        var scanAreaNextLine = new HashSet<int>();
 
         for (int i = 0; i < currentLine.Length; i++)
         {
-            if (IsDigit(currentLine[i]))
+            var currentCharacter = currentLine[i];
+
+            if (IsDigit(currentCharacter))
             {
+                if (currentNumberPositionStart >= 0)
+                {
+                    currentNumberPositionEnd = i;
+                }
+                else
+                {
+                    currentNumberPositionStart = i;
+                    currentNumberPositionEnd = i;
+                }
+
                 // Add left
                 if (string.IsNullOrEmpty(currentNumberString) && i > 0)
                 {
-                    scanRangeCurrentLine.Add(i - 1);
+                    scanAreaCurrentLine.Add(i - 1);
                 }
 
-                currentNumberString += currentLine[i];
+                currentNumberString += currentCharacter;
 
                 // Add diagonals left
                 if (i > 0)
                 {
-                    scanRangePreviousLine.Add(i - 1);
-                    scanRangeNextLine.Add(i - 1);
+                    scanAreaPreviousLine.Add(i - 1);
+                    scanAreaNextLine.Add(i - 1);
                 }
 
                 // Add above & below
-                scanRangePreviousLine.Add(i);
-                scanRangeNextLine.Add(i);
+                scanAreaPreviousLine.Add(i);
+                scanAreaNextLine.Add(i);
 
                 // Add diagonals right
                 if (i < currentLine.Length - 1)
                 {
-                    scanRangePreviousLine.Add(i + 1);
-                    scanRangeNextLine.Add(i + 1);
+                    scanAreaPreviousLine.Add(i + 1);
+                    scanAreaNextLine.Add(i + 1);
                 }
             }
             else
             {
-                // Add right
-                scanRangeCurrentLine.Add(i);
-
-                if (!string.IsNullOrEmpty(currentNumberString) && IsPartNumber(previousLine, currentLine, nextLine, scanRangePreviousLine, scanRangeCurrentLine, scanRangeNextLine))
+                if (IsGear(currentCharacter))
                 {
-                    partNumbers.Add(int.Parse(currentNumberString));
+                    gearPositions.Add((row: row, column: i));
+                }
+
+                // Add right
+                scanAreaCurrentLine.Add(i);
+
+                if (!string.IsNullOrEmpty(currentNumberString) && IsPartNumber(previousLine, currentLine, nextLine, scanAreaPreviousLine, scanAreaCurrentLine, scanAreaNextLine))
+                {
+                    partNumbers.Add(new PartNumber
+                    {
+                        Value = int.Parse(currentNumberString),
+                        Row = row,
+                        PositionStart = currentNumberPositionStart,
+                        PositionEnd = currentNumberPositionEnd
+                    });
                 }
 
                 currentNumberString = string.Empty;
-                scanRangePreviousLine.Clear();
-                scanRangeCurrentLine.Clear();
-                scanRangeNextLine.Clear();
+                currentNumberPositionStart = -1;
+                currentNumberPositionEnd = -1;
+
+                scanAreaPreviousLine.Clear();
+                scanAreaCurrentLine.Clear();
+                scanAreaNextLine.Clear();
             }
 
-            if (i == currentLine.Length - 1 && !string.IsNullOrEmpty(currentNumberString) && IsPartNumber(previousLine, currentLine, nextLine, scanRangePreviousLine, scanRangeCurrentLine, scanRangeNextLine))
+            if (i == currentLine.Length - 1 && !string.IsNullOrEmpty(currentNumberString) && IsPartNumber(previousLine, currentLine, nextLine, scanAreaPreviousLine, scanAreaCurrentLine, scanAreaNextLine))
             {
-                partNumbers.Add(int.Parse(currentNumberString));
+                partNumbers.Add(new PartNumber
+                {
+                    Value = int.Parse(currentNumberString),
+                    Row = row,
+                    PositionStart = currentNumberPositionStart,
+                    PositionEnd = currentNumberPositionEnd
+                });
             }
         }
 
-        return partNumbers;
+        return (partNumbers, gearPositions);
     }
 
-    private static bool IsPartNumber(string previousLine, string currentLine, string nextLine, HashSet<int> scanRangePreviousLine, HashSet<int> scanRangeCurrentLine, HashSet<int> scanRangeNextLine)
+    private static bool IsPartNumber(string previousLine, string currentLine, string nextLine, HashSet<int> scanAreaPreviousLine, HashSet<int> scanAreaCurrentLine, HashSet<int> scanAreaNextLine)
     {
-        return Check(previousLine, scanRangePreviousLine)
-               || Check(currentLine, scanRangeCurrentLine)
-               || Check(nextLine, scanRangeNextLine);
+        return Check(previousLine, scanAreaPreviousLine)
+               || Check(currentLine, scanAreaCurrentLine)
+               || Check(nextLine, scanAreaNextLine);
     }
 
     private static bool Check(string line, HashSet<int> scanRange)
@@ -120,8 +166,50 @@ public static class Solution
         return false;
     }
 
+    private static List<int> GetGearRatios(List<PartNumber> partNumbers, List<(int row, int column)> gearPositions)
+    {
+        var gearRatios = new List<int>();
+
+        foreach (var gearPosition in gearPositions)
+        {
+            var neighborPartNumbers = partNumbers.Where(partNumber => PartNumberIsNeighborToGear(partNumber, gearPosition)).ToList();
+
+            if (neighborPartNumbers.Count == 2)
+            {
+                gearRatios.Add(neighborPartNumbers[0].Value * neighborPartNumbers[1].Value);
+            }
+        }
+
+        return gearRatios;
+    }
+
+    private static bool PartNumberIsNeighborToGear(PartNumber partNumber, (int row, int column) gearPosition)
+    {
+        // Check north and north diagonals
+        if (partNumber.Row == gearPosition.row - 1 && gearPosition.column >= partNumber.PositionStart - 1 && gearPosition.column <= partNumber.PositionEnd + 1)
+        {
+            return true;
+        }
+
+        // Check south and south diagonals
+        if (partNumber.Row == gearPosition.row + 1 && gearPosition.column >= partNumber.PositionStart - 1 && gearPosition.column <= partNumber.PositionEnd + 1)
+        {
+            return true;
+        }
+
+        // Check left and right
+        if (partNumber.Row == gearPosition.row && (gearPosition.column == partNumber.PositionStart - 1 || gearPosition.column == partNumber.PositionEnd + 1))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     private static bool IsDigit(char c) => Digits.Contains(c);
     //private static bool IsDigit(char c) => char.IsAsciiDigit(c);
     private static bool IsSymbol(char c) => Symbols.Contains(c);
     //private static bool IsSymbol(char c) => !IsDigit(c) && c != '.';
+    private static bool IsGear(char c) => c == '*';
+    
 }
